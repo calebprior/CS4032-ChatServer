@@ -226,18 +226,20 @@ class Worker(socket: Socket, chatServer: ChatSeverTrait) extends Runnable {
     // Inform new client
     val joinMsg = ("JOINED_CHATROOM:" + groupName
                   + "\nSERVER_IP:" + ipAddress
-                  + "\nPORT" + port
-                  + "\nROOM_REF" + groupId
-                  + "\nJOIN_ID" + joinId)
+                  + "\nPORT:" + port
+                  + "\nROOM_REF:" + groupId
+                  + "\nJOIN_ID:" + joinId)
 
     bufferOut.println(joinMsg)
     bufferOut.flush
+
+    println("WORKER: " + Thread.currentThread.getId + " sent "+ joinMsg + " to " + client.handle)
 
     // Inform Rest of group
     var msgToGroup = client.handle + " joined chatroom"
     group.sendMessage(client, msgToGroup)
 
-    println("WORKER: " + Thread.currentThread.getId + msgToGroup + " " + group.groupName)
+    println("WORKER: " + Thread.currentThread.getId + " " + msgToGroup + " " + group.groupName)
   }
 
   def isLeave(message: String): Boolean = {
