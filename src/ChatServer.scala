@@ -7,6 +7,7 @@ trait ChatSeverTrait {
   def getUniqueId:Int
 
   def getGroup(groupName:String):Group
+  def getGroup(groupId:Int):Group
   def addGroup(newGroup:Group):Unit
   def groupExists(groupName:String):Boolean
   def groupExists(groupId:Int):Boolean
@@ -101,6 +102,17 @@ object ChatServer extends ChatSeverTrait{
     null
   }
 
+  def getGroup(groupId:Int):Group = {
+    if(groups.nonEmpty){
+      for(g <- groups){
+        if(g.groupId == groupId){
+          return g
+        }
+      }
+    }
+    null
+  }
+
   def clientExists(clientName:String):Boolean = {
     clients.nonEmpty && clients.exists(c => c.handle == clientName)
   }
@@ -155,7 +167,7 @@ class Worker(socket: Socket, chatServer: ChatSeverTrait) extends Runnable {
     } else if(isJoin(message)) {
       handleJoin(message)
     } else if(isLeave(message)) {
-
+      handleLeave(message)
     } else if(isChat(message)) {
 
     } else if(isDisconnect(message)) {
@@ -245,6 +257,33 @@ class Worker(socket: Socket, chatServer: ChatSeverTrait) extends Runnable {
 
   def isLeave(message: String): Boolean = {
     message.startsWith("LEAVE_CHATROOM")
+  }
+
+  def handleLeave(firstLine:String):Unit = {
+    var groupId = firstLine.dropWhile(_ != ':').drop(2).toInt
+
+    var message = bufferIn.readLine
+    var joinId = message.dropWhile(_ != ':').drop(2).toInt
+
+    message = bufferIn.readLine
+    var clientName = message.dropWhile(_ != ':').drop(2)
+
+    var group = chatServer.getGroup(groupId)
+    var client = chatServer.getClient(clientName)
+    if(group != null){
+      val response = "LEFT_CHATROOM: " + groupId + "\nJOIN_ID:" + joinId
+      bufferOut.println(response)
+      bufferOut.flush()
+
+      var msgToGroup = clientName + " has left this chatroom."
+      group.sendMessage(client, msgToGroup)
+
+      group.removeClient(joinId)
+
+      println("WORKER: " + Thread.currentThread.getId + " " + msgToGroup + " " + groupId);
+    } else {
+      println("WORKER: " + Thread.currentThread.getId + " leave group, not found " + groupId)
+    }
   }
 
   def isChat(message: String): Boolean = {
