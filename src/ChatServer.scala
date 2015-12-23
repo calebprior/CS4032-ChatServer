@@ -169,7 +169,7 @@ class Worker(socket: Socket, chatServer: ChatSeverTrait) extends Runnable {
     } else if(isLeave(message)) {
       handleLeave(message)
     } else if(isChat(message)) {
-
+      handleChat(message)
     } else if(isDisconnect(message)) {
 
     } else if (isKillService(message)) {
@@ -194,6 +194,7 @@ class Worker(socket: Socket, chatServer: ChatSeverTrait) extends Runnable {
 
   def killService(): Unit = {
     chatServer.shutdown
+    socket.close()
   }
 
   def isJoin(message: String): Boolean = {
@@ -290,7 +291,31 @@ class Worker(socket: Socket, chatServer: ChatSeverTrait) extends Runnable {
     message.startsWith("CHAT")
   }
 
+  def handleChat(firstLine:String):Unit = {
+    var groupId = firstLine.dropWhile(_ != ':').drop(2).toInt
+
+    var message = bufferIn.readLine
+    var joinId = message.dropWhile(_ != ':').drop(2).toInt
+
+    message = bufferIn.readLine
+    var clientName = message.dropWhile(_ != ':').drop(2)
+
+    message = bufferIn.readLine
+    var sendMessage = message.dropWhile(_ != ':').drop(2)
+
+    var group = chatServer.getGroup(groupId)
+    var client = chatServer.getClient(clientName)
+
+    group.sendMessage(client, sendMessage)
+
+    println("WORKER: " + Thread.currentThread.getId + " sent message " + sendMessage + " to " + group )
+  }
+
   def isDisconnect(message: String): Boolean = {
     message.startsWith("DISCONNECT")
+  }
+
+  def handleDisconnect(firstLine:String):Unit = {
+    
   }
 }
