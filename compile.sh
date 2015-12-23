@@ -1,1 +1,1 @@
-scalac src/ChatServer.scala
+scalac ./src/*.scala
