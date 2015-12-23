@@ -6,5 +6,5 @@ import java.net.Socket
 class Client (clientHandle:String, clientId:Int, clientSocket:Socket){
   val handle:String = clientHandle
   val joinId:Int = clientId
-  val socket:Socket = clientSocket
+  var socket: Socket = clientSocket
 }

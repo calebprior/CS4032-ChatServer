@@ -3,7 +3,17 @@ import java.net.{Socket, ServerSocket}
 import java.util.concurrent.{Executors, ExecutorService}
 
 trait ChatSeverTrait {
-  def shutdown()
+  def shutdown:Unit
+  def getUniqueId:Int
+
+  def getGroup(groupName:String):Group
+  def addGroup(newGroup:Group):Unit
+  def groupExists(groupName:String):Boolean
+  def groupExists(groupId:Int):Boolean
+
+  def getClient(clientName:String):Client
+  def addClient(newClient:Client):Unit
+  def clientExists(clientName:String):Boolean
 }
 
 /**
@@ -57,9 +67,56 @@ object ChatServer extends ChatSeverTrait{
   }
 
 
-  def shutdown() = {
+  def shutdown = {
     println("CHAT SERVER: Closing server socket")
     serverSocket.close()
+  }
+
+  def getUniqueId:Int = synchronized{
+    uniqueId = uniqueId + 1
+    uniqueId
+  }
+
+  def addGroup(newGroup:Group):Unit = {
+    groups = newGroup :: groups
+  }
+
+  def groupExists(groupName:String):Boolean = {
+    groups.nonEmpty && groups.exists(g => g.groupName == groupName)
+  }
+
+  def groupExists(groupId:Int):Boolean = {
+    groups.nonEmpty && groups.exists(g => g.groupId == groupId)
+  }
+
+  def getGroup(groupName:String):Group = {
+    if(groups.nonEmpty){
+      for(g <- groups){
+        if(g.groupName == groupName){
+          return g
+        }
+      }
+    }
+    null
+  }
+
+  def clientExists(clientName:String):Boolean = {
+    clients.nonEmpty && clients.exists(c => c.handle == clientName)
+  }
+
+  def addClient(newClient:Client):Unit = {
+    clients = newClient :: clients
+  }
+
+  def getClient(clientName:String):Client = {
+    if(clients.nonEmpty){
+      for(c <- clients){
+        if(c.handle == clientName){
+          return c
+        }
+      }
+    }
+    null
   }
 }
 
@@ -123,15 +180,63 @@ class Worker(socket: Socket, chatServer: ChatSeverTrait) extends Runnable {
   }
 
   def killService(): Unit = {
-    chatServer.shutdown()
+    chatServer.shutdown
   }
 
   def isJoin(message: String): Boolean = {
     message.startsWith("JOIN_CHATROOM")
   }
 
-  def handleJoin(message:String):Unit = {
+  def handleJoin(firstLine:String):Unit = {
+    println("WORKER: " + Thread.currentThread + " JOIN_CHATROOM")
+    var groupName = firstLine.dropWhile(_ != ':').drop(1)
 
+    var message = bufferIn.readLine()
+    var clientIp = message.dropWhile(_ != ':').drop(1)
+
+    message = bufferIn.readLine()
+    var port = message.dropWhile(_ != ':').drop(1)
+
+    message = bufferIn.readLine()
+    var clientName = message.dropWhile(_ != ':').drop(1)
+
+    var groupId = 0
+    var joinId = 0
+
+    if(!chatServer.groupExists(groupName)){
+      groupId = chatServer.getUniqueId
+      chatServer.addGroup(new Group(groupName, groupId))
+    } else {
+      groupId = chatServer.getGroup(groupName).groupId
+    }
+
+    if(!chatServer.clientExists(clientName)){
+      joinId = chatServer.getUniqueId
+      chatServer.addClient(new Client(clientName, joinId, socket))
+    } else {
+      val client = chatServer.getClient(clientName)
+      client.socket = socket
+      joinId = client.joinId
+    }
+
+    var group = chatServer.getGroup(groupName)
+    var client = chatServer.getClient(clientName)
+
+    // Inform new client
+    val joinMsg = ("JOINED_CHATROOM:" + groupName
+                  + "\nSERVER_IP:" + ipAddress
+                  + "\nPORT" + port
+                  + "\nROOM_REF" + groupId
+                  + "\nJOIN_ID" + joinId)
+
+    bufferOut.println(joinMsg)
+    bufferOut.flush
+
+    // Inform Rest of group
+    var msgToGroup = client.handle + " joined chatroom"
+    group.sendMessage(client, msgToGroup)
+
+    println("WORKER: " + Thread.currentThread() + msgToGroup + " " + group.groupName)
   }
 
   def isLeave(message: String): Boolean = {
