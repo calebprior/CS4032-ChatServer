@@ -215,9 +215,8 @@ class Worker(socket: Socket, chatServer: ChatSeverTrait) extends Runnable {
       joinId = chatServer.getUniqueId
       chatServer.addClient(new Client(clientName, joinId, socket))
     } else {
-      val client = chatServer.getClient(clientName)
-      client.socket = socket
-      joinId = client.joinId
+      chatServer.getClient(clientName).socket = socket
+      joinId = chatServer.getClient(clientName).joinId
     }
 
     var group = chatServer.getGroup(groupName)

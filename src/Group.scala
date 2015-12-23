@@ -29,7 +29,7 @@ class Group (name:String, id:Int) {
   }
 
   def sendMessage(sender:Client, message:String):Unit ={
-    val msg = "CHAT" + groupId + "\nCLIENT_NAME:" + sender.handle + "\nMESSAGE:" + message + "\n"
+    val msg = "CHAT:" + groupId + "\nCLIENT_NAME:" + sender.handle + "\nMESSAGE:" + message + "\n"
 
     for(c <- clients){
       val bufferOut = new PrintWriter(new BufferedWriter(new OutputStreamWriter(c.socket.getOutputStream)))
