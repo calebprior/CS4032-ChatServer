@@ -44,13 +44,14 @@ object ChatServer extends ChatSeverTrait{
           println("CHAT SERVER: Shutting down")
           running = false
           pool.shutdown()
-      } finally {
-        if(!serverSocket.isClosed  && serverSocket!= null){
-          serverSocket.close()
-        }
       }
-      System.exit(0)
     }
+    
+    if (!serverSocket.isClosed && serverSocket != null) {
+      serverSocket.close()
+    }
+
+    System.exit(0)
   }
 
   def Setup(portNumber: String): Unit = {
