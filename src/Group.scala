@@ -4,7 +4,7 @@ import java.io.{OutputStreamWriter, BufferedWriter, PrintWriter}
   * Created by Caleb Prior on 23-Dec-15.
   */
 class Group (name:String, id:Int) {
-  val groupName:String = groupName
+  val groupName:String = name
   val groupId:Int = id
   var clients:List[Client] = List()
 
