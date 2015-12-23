@@ -1,0 +1,1 @@
+scala ChatServer $1
