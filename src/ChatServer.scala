@@ -237,7 +237,7 @@ class Worker(socket: Socket, chatServer: ChatSeverTrait) extends Runnable {
     println("WORKER: " + Thread.currentThread.getId + " sent "+ joinMsg + " to " + client.handle)
 
     // Inform Rest of group
-    var msgToGroup = client.handle + " joined chatroom"
+    var msgToGroup = client.handle + " has joined this chatroom."
     group.sendMessage(client, msgToGroup)
 
     println("WORKER: " + Thread.currentThread.getId + " " + msgToGroup + " " + group.groupName)
