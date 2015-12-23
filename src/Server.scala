@@ -8,7 +8,7 @@ import scala.io.BufferedSource
  * Created by Caleb Prior on 12-Oct-15.
  */
 object Server{
-  var poolSize = 8
+  var poolSize = 15
   var running = true
   var serverSocket : ServerSocket = null
 
@@ -72,7 +72,13 @@ class SocketHandler(socket: Socket, shutdown: () => Unit, port: Int) extends Run
       killService()
     }else if (isHELO(message)){
       handleHELO(message)
+    } else {
+      readRest(message)
     }
+  }
+
+  def readRest(message:String): Unit ={
+    // READ IN MORE LINES
   }
 
   def isKillService(message: String): Boolean ={
