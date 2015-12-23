@@ -46,7 +46,7 @@ object ChatServer extends ChatSeverTrait{
           pool.shutdown()
       }
     }
-    
+
     if (!serverSocket.isClosed && serverSocket != null) {
       serverSocket.close()
     }
@@ -145,7 +145,7 @@ class Worker(socket: Socket, chatServer: ChatSeverTrait) extends Runnable {
       }
     } catch {
       case e:Exception =>
-        println("WORKER: " + Thread.currentThread + " EXCEPTION " + e.getMessage)
+        println("WORKER: " + Thread.currentThread.getId + " EXCEPTION " + e.getMessage)
     }
   }
 
@@ -163,7 +163,7 @@ class Worker(socket: Socket, chatServer: ChatSeverTrait) extends Runnable {
     } else if (isKillService(message)) {
       killService()
     } else {
-      println("WORKER: " + Thread.currentThread + " unknown message")
+      println("WORKER: " + Thread.currentThread.getId + " unknown message")
     }
   }
 
@@ -189,14 +189,14 @@ class Worker(socket: Socket, chatServer: ChatSeverTrait) extends Runnable {
   }
 
   def handleJoin(firstLine:String):Unit = {
-    println("WORKER: " + Thread.currentThread + " JOIN_CHATROOM")
+    println("WORKER: " + Thread.currentThread.getId + " JOIN_CHATROOM")
     var groupName = firstLine.dropWhile(_ != ':').drop(1)
 
     var message = bufferIn.readLine()
     var clientIp = message.dropWhile(_ != ':').drop(1)
 
     message = bufferIn.readLine()
-    var port = message.dropWhile(_ != ':').drop(1)
+    var joinPort = message.dropWhile(_ != ':').drop(1)
 
     message = bufferIn.readLine()
     var clientName = message.dropWhile(_ != ':').drop(1)
@@ -237,7 +237,7 @@ class Worker(socket: Socket, chatServer: ChatSeverTrait) extends Runnable {
     var msgToGroup = client.handle + " joined chatroom"
     group.sendMessage(client, msgToGroup)
 
-    println("WORKER: " + Thread.currentThread() + msgToGroup + " " + group.groupName)
+    println("WORKER: " + Thread.currentThread.getId + msgToGroup + " " + group.groupName)
   }
 
   def isLeave(message: String): Boolean = {
