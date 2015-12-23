@@ -136,7 +136,7 @@ object ChatServer extends ChatSeverTrait{
   def removeClientFromAll(client: Client): Unit = {
     val leaveMsg = client.handle + "  has left this chatroom."
 
-    for(g <- groups){
+    for(g <- groups.reverse){
       if(g.hasClient(client.joinId)){
         g.sendMessage(client, leaveMsg)
         g.removeClient(client.joinId)

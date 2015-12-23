@@ -28,12 +28,12 @@
       <file leaf-file-name="ChatServer.scala" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/ChatServer.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.8261851">
-              <caret line="343" column="3" selection-start-line="343" selection-start-column="3" selection-end-line="343" selection-end-column="3" />
+            <state vertical-scroll-proportion="0.19864559">
+              <caret line="138" column="29" selection-start-line="138" selection-start-column="29" selection-end-line="138" selection-end-column="29" />
               <folding>
                 <element signature="e#0#16#0" expanded="true" />
                 <element signature="e#1483#1810#0" expanded="false" />
-                <element signature="e#5374#7122#0" expanded="false" />
+                <element signature="e#5382#7130#0" expanded="false" />
               </folding>
             </state>
           </provider>
@@ -667,7 +667,7 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="14375000" />
+    <option name="totallyTimeSpent" value="14501000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-7" y="0" width="1065" height="1047" extended-state="0" />
@@ -766,12 +766,12 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/ChatServer.scala">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.8261851">
-          <caret line="343" column="3" selection-start-line="343" selection-start-column="3" selection-end-line="343" selection-end-column="3" />
+        <state vertical-scroll-proportion="0.19864559">
+          <caret line="138" column="29" selection-start-line="138" selection-start-column="29" selection-end-line="138" selection-end-column="29" />
           <folding>
             <element signature="e#0#16#0" expanded="true" />
             <element signature="e#1483#1810#0" expanded="false" />
-            <element signature="e#5374#7122#0" expanded="false" />
+            <element signature="e#5382#7130#0" expanded="false" />
           </folding>
         </state>
       </provider>
