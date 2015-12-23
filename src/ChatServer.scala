@@ -15,6 +15,7 @@ trait ChatSeverTrait {
   def getClient(clientName:String):Client
   def addClient(newClient:Client):Unit
   def clientExists(clientName:String):Boolean
+  def removeClientFromAll(client:Client):Unit
 }
 
 /**
@@ -131,6 +132,17 @@ object ChatServer extends ChatSeverTrait{
     }
     null
   }
+
+  def removeClientFromAll(client: Client): Unit = {
+    val leaveMsg = client.handle + "  has left this chatroom."
+
+    for(g <- groups){
+      if(g.hasClient(client.joinId)){
+        g.sendMessage(client, leaveMsg)
+        g.removeClient(client.joinId)
+      }
+    }
+  }
 }
 
 class Worker(socket: Socket, chatServer: ChatSeverTrait) extends Runnable {
@@ -171,7 +183,7 @@ class Worker(socket: Socket, chatServer: ChatSeverTrait) extends Runnable {
     } else if(isChat(message)) {
       handleChat(message)
     } else if(isDisconnect(message)) {
-
+      handleDisconnect(message)
     } else if (isKillService(message)) {
       killService()
     } else {
@@ -316,6 +328,18 @@ class Worker(socket: Socket, chatServer: ChatSeverTrait) extends Runnable {
   }
 
   def handleDisconnect(firstLine:String):Unit = {
-    
+    // Skip first 2 lines
+    var message = bufferIn.readLine
+    message  = bufferIn.readLine
+
+    var clientName = message.dropWhile(_ != ':').drop(1)
+
+    var client = chatServer.getClient(clientName)
+
+    println("WORKER: " + Thread.currentThread.getId + " removing " + clientName + " from all")
+    chatServer.removeClientFromAll(client)
+    bufferOut.close()
+    bufferIn.close()
+    client.socket.close()
   }
 }
