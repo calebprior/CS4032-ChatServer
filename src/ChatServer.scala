@@ -222,6 +222,8 @@ class Worker(socket: Socket, chatServer: ChatSeverTrait) extends Runnable {
     var group = chatServer.getGroup(groupName)
     var client = chatServer.getClient(clientName)
 
+    group.addClient(client)
+
     // Inform new client
     val joinMsg = ("JOINED_CHATROOM:" + groupName
                   + "\nSERVER_IP:" + ipAddress
@@ -230,7 +232,7 @@ class Worker(socket: Socket, chatServer: ChatSeverTrait) extends Runnable {
                   + "\nJOIN_ID:" + joinId)
 
     bufferOut.println(joinMsg)
-    bufferOut.flush
+    bufferOut.flush()
 
     println("WORKER: " + Thread.currentThread.getId + " sent "+ joinMsg + " to " + client.handle)
 
